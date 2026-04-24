@@ -490,5 +490,6 @@ That's it. The rule engine picks it up automatically.
 ## License
 
 MIT © 2026
-#   R e a c t - p e r f o r m a n c e - a n a l y z e r  
+#   R e a c t - p e r f o r m a n c e - a n a l y z e r 
+ 
  

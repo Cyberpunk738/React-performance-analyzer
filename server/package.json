@@ -1,0 +1,15 @@
+{
+  "name": "react-perf-analyzer-server",
+  "version": "1.0.0",
+  "description": "Backend for React Performance Analyzer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "esbuild": "^0.20.2",
+    "express": "^4.18.3"
+  }
+}
