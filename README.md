@@ -146,8 +146,8 @@ User code (string)
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/react-performance-analyzer.git
-cd react-performance-analyzer
+git clone https://github.com/Cyberpunk738/React-performance-analyzer.git
+cd React-performance-analyzer
 
 # Install backend dependencies
 cd server
@@ -224,17 +224,15 @@ react-performance-analyzer/
 │       ├── services/
 │       │   └── api.js               # Axios client (POST /api/analyze)
 │       ├── pages/
-│       │   └── AnalyzerPage.jsx     # Main page + page-specific layout primitives
+│       │   └── AnalyzerPage.jsx     # Main page: toolbar, error banner, editors, results
 │       └── components/
-│           ├── layout/
-│           │   └── Header.jsx       # Sticky header (LogoMark, StatusBadge, GitHubLink)
 │           ├── editors/
 │           │   └── CodeEditor.jsx   # Monaco wrapper (EditorHeader, VersionDot)
 │           ├── results/
-│           │   ├── ComparisonPanel.jsx  # Composition of OverallWinner + MetricCards
-│           │   ├── MetricCard.jsx       # Per-metric card (VersionValue, DeltaIndicator)
+│           │   ├── ComparisonPanel.jsx  # Bottom metrics panel (StatusBar, MetricCard, InlineMetric)
+│           │   ├── MetricCard.jsx       # Expanded-view metric card (VersionValue)
 │           │   ├── OverallWinner.jsx    # Winner banner / tie state
-│           │   └── ResultsChart.jsx     # Recharts bar charts (ChartCard, ChartTooltip)
+│           │   └── ResultsChart.jsx     # Recharts bar charts (ChartPane, ChartTooltip)
 │           └── feedback/
 │               ├── ErrorDisplay.jsx     # Error banner with esbuild syntax details
 │               ├── LoadingOverlay.jsx   # Dual-ring spinner + shimmer skeleton
@@ -325,31 +323,22 @@ Returns server liveness status.
 
 ```
 App
-├── Background layers (app-bg, dot-grid)
-├── Header
-│   ├── LogoMark (animated gradient + hover glow)
-│   ├── StatusBadge ("esbuild powered" indicator)
-│   └── GitHubLink
+├── Header (inline in App.jsx)
+│   ├── Logo (bolt icon + "ReactPerf Analyzer")
+│   └── StatusIndicator ("Backend connected")
 └── AnalyzerPage
-    ├── HeroBar (title + Analyze button)
+    ├── Toolbar (title + Clear / Analyze buttons)
+    ├── ErrorBanner? (inline — dismissible error strip)
     ├── EditorGrid
     │   ├── CodeEditor (Version A)
     │   └── CodeEditor (Version B)
-    ├── ResultsDivider (gradient line + label)
-    ├── ErrorDisplay?
-    ├── LoadingOverlay?
-    └── Results?
-        ├── ComparisonPanel
-        │   ├── OverallWinner / TieBanner
-        │   └── MetricCard × 2
-        │       ├── VersionValue × 2
-        │       └── DeltaIndicator
-        ├── ResultsChart
-        │   └── ChartCard × 2
-        │       └── ChartTooltip
-        └── TipsPanel
-            └── TipRow × N
+    └── ComparisonPanel
+        ├── StatusBar (label + optional InlineMetric × 2)
+        ├── MetricCard × 4 (Bundle Size, Build Time, Warnings, Tips)
+        └── Tips detail row? (expandable optimization suggestions)
 ```
+
+> **Note:** `MetricCard.jsx`, `OverallWinner.jsx`, `ResultsChart.jsx`, and the `feedback/` components exist as standalone files for the expanded results view, but the primary results UI is handled by `ComparisonPanel.jsx` with its own internal sub-components.
 
 ### Custom Hook: `useAnalyzer`
 
@@ -490,6 +479,3 @@ That's it. The rule engine picks it up automatically.
 ## License
 
 MIT © 2026
-#   R e a c t - p e r f o r m a n c e - a n a l y z e r 
- 
- 

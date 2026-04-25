@@ -7,87 +7,79 @@ export default function AnalyzerPage() {
   const {
     codeA, codeB, setCodeA, setCodeB,
     results, loading, error,
-    analyze
+    analyze, clearResults, dismissError,
   } = useAnalyzer(DEFAULT_CODE_A, DEFAULT_CODE_B);
 
-  const getBadgeA = () => {
-    if (!results?.A) return null;
-    return `${(results.A.bundleSize / 1024).toFixed(1)}MB BUNDLE`; // Faking MB for matching visual look, in reality we'd calculate real MB
-  };
-
-  const getBadgeB = () => {
-    if (!results?.B) return null;
-    const size = (results.B.bundleSize / 1024).toFixed(1);
-    if (results.comparison) {
-      const diff = results.A.bundleSize - results.B.bundleSize;
-      const pct = (diff / results.A.bundleSize) * 100;
-      const sign = pct > 0 ? "-" : "+";
-      return `${size}MB BUNDLE\n(${sign}${Math.abs(pct).toFixed(0)}%)`;
-    }
-    return `${size}MB BUNDLE`;
-  };
-
   return (
-    <div className="flex flex-col h-full w-full bg-[#161616]">
-      {/* Header Area */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#2c2c2c] bg-[#1a1a1a] shrink-0">
+    <>
+      {/* Page toolbar */}
+      <div className="flex items-center justify-between px-lg py-md border-b border-[#333333] shrink-0">
         <div>
-          <h2 className="text-[20px] font-bold text-white tracking-tight">Code Comparison</h2>
-          <p className="text-[12px] text-[#a1a1aa] mt-0.5">
-            Analyzing <span className="text-[#38bdf8] font-medium font-mono">dashboard-v2.tsx</span> performance regression between commits
+          <h1 className="text-headline font-headline text-on-surface">Code Comparison</h1>
+          <p className="text-body-xs text-slate-500">
+            Paste two versions of React/JavaScript code to compare bundle size &amp; build performance
           </p>
         </div>
-
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#262626] border border-[#3f3f46] rounded text-[11px] text-[#a1a1aa] font-medium">
-            <svg className="w-3.5 h-3.5 text-[#38bdf8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            Last Run: {results ? "Just now" : "2m ago"}
-          </div>
+        <div className="flex gap-sm items-center">
+          {results && (
+            <button
+              onClick={clearResults}
+              className="bg-surface-container-high text-on-surface-variant px-md py-1.5 rounded-lg font-label-caps text-xs flex items-center gap-xs border border-[#333333] transition-all hover:bg-surface-bright active:scale-95"
+            >
+              <span className="material-symbols-outlined text-sm">refresh</span>
+              Clear
+            </button>
+          )}
           <button
             onClick={analyze}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-1.5 text-[12px] font-bold text-[#3b0764] bg-[#e9d5ff] hover:bg-[#d8b4fe] rounded transition-colors disabled:opacity-60"
+            className="bg-primary text-on-primary px-lg py-1.5 rounded-lg font-label-caps text-xs flex items-center gap-sm shadow-lg shadow-primary/10 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <div className="w-3.5 h-3.5 border-2 border-[#3b0764]/20 border-t-[#3b0764] rounded-full" style={{ animation: 'spin 0.6s linear infinite' }} />
+              <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
             ) : (
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <span className="material-symbols-outlined text-sm">play_arrow</span>
             )}
-            Analyze Performance
+            {loading ? "Analyzing..." : "Analyze Performance"}
           </button>
         </div>
       </div>
 
-      {/* Editors Area */}
-      <div className="flex-1 min-h-0 flex bg-[#1e1e1e]">
-        <div className="flex-1 min-w-0 border-r border-[#333]">
+      {/* Error banner */}
+      {error && (
+        <div className="flex items-center gap-sm px-lg py-2.5 bg-error-container/30 border-b border-error/20 animate-fade-in">
+          <span className="material-symbols-outlined text-error text-sm">error</span>
+          <span className="text-body-xs text-error font-medium flex-1">{error.message || "Analysis failed. Check your code and try again."}</span>
+          <button onClick={dismissError} className="text-error/60 hover:text-error transition-colors p-1">
+            <span className="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+      )}
+
+      {/* Editors side-by-side */}
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col border-r border-[#333333]">
           <CodeEditor
             value={codeA}
             onChange={setCodeA}
-            label="VERSION A"
-            filename="main/src/components/List.tsx"
-            badge={getBadgeA()}
-            color="#475569"
-            textColor="#f1f5f9"
-            badgeColor="#ef4444"
+            version="A"
+            filename="version-a.jsx"
+            results={results}
           />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 flex flex-col">
           <CodeEditor
             value={codeB}
             onChange={setCodeB}
-            label="VERSION B"
-            filename="feature/opt-list/src/components/List.tsx"
-            badge={getBadgeB()}
-            color="#d946ef"
-            textColor="#fff"
-            badgeColor="#84cc16"
+            version="B"
+            filename="version-b.jsx"
+            results={results}
           />
         </div>
       </div>
 
-      {/* Results Area */}
-      <ComparisonPanel results={results} loading={loading} error={error} />
-    </div>
+      {/* Bottom metrics panel */}
+      <ComparisonPanel results={results} loading={loading} />
+    </>
   );
 }
